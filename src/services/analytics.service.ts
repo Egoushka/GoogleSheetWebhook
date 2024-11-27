@@ -1,13 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { AnalyticsRepository } from '../repositories/analytics.repository';
-import { EmailService } from './email.service';
 
 @Injectable()
 export class AnalyticsService {
-  constructor(
-    private readonly analyticsRepository: AnalyticsRepository,
-    private readonly emailService: EmailService,
-  ) {}
+  constructor(private readonly analyticsRepository: AnalyticsRepository) {}
 
   async logEvent(eventType: string, description: string): Promise<void> {
     await this.analyticsRepository.logEvent(eventType, description);

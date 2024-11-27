@@ -7,6 +7,9 @@ import { Row } from './models/row.model';
 import { AnalyticsController } from './controllers/analytics.controller';
 import { RowController } from './controllers/row.controller';
 import { WebhookController } from './controllers/webhook.controller';
+import { AnalyticsService } from './services/analytics.service';
+import { EmailService } from './services/email.service';
+import { RowService } from './services/row.service';
 
 dotenv.config();
 
@@ -25,6 +28,6 @@ dotenv.config();
     }),
   ],
   controllers: [AnalyticsController, RowController, WebhookController],
-  providers: [],
+  providers: [AnalyticsService, EmailService, RowService],
 })
 export class AppModule {}
