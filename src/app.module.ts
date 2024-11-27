@@ -12,6 +12,7 @@ import { EmailService } from './services/email.service';
 import { RowService } from './services/row.service';
 import { AnalyticsRepository } from './repositories/analytics.repository';
 import { RowRepository } from './repositories/row.repository';
+import { EventsGateway } from './events/events.gateway';
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ dotenv.config();
     RowService,
     AnalyticsRepository,
     RowRepository,
+    EventsGateway,
   ],
 })
 export class AppModule {}
