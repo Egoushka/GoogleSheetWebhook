@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as dotenv from 'dotenv';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Analytics } from './models/analytics.model';
 import { Row } from './models/row.model';
+import { AnalyticsController } from './controllers/analytics.controller';
+import { RowController } from './controllers/row.controller';
+import { WebhookController } from './controllers/webhook.controller';
 
 dotenv.config();
 
@@ -23,7 +24,7 @@ dotenv.config();
       synchronize: process.env.DB_SYNCHRONIZE === 'true',
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AnalyticsController, RowController, WebhookController],
+  providers: [],
 })
 export class AppModule {}

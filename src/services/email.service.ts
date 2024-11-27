@@ -10,7 +10,7 @@ export class EmailService {
   async sendEmailNotification(to: string, content: string) {
     await sgMail.send({
       to,
-      from: 'your-email@example.com',
+      from: 'egorgrabovskij@gmail.com',
       subject: 'New Update in Google Sheets',
       text: content,
     });

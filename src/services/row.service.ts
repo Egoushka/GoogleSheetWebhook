@@ -5,7 +5,6 @@ import { Inject } from '@nestjs/common';
 import { Cache } from '@nestjs/cache-manager';
 import { Row } from 'src/models/row.model';
 import { EventsGateway } from 'src/events/events.gateway';
-import { EmailService } from './email.service';
 import { RowRepository } from 'src/repositories/row.repository';
 
 @Injectable()
@@ -15,7 +14,6 @@ export class RowService {
     private readonly rowRepository: RowRepository,
     private readonly analyticsService: AnalyticsService,
     private readonly eventsGateway: EventsGateway,
-    private readonly emailService: EmailService,
     @Inject('CACHE_MANAGER') private readonly cacheManager: Cache,
   ) {}
 
@@ -28,8 +26,7 @@ export class RowService {
       `New row created with content: ${content}`,
     );
 
-    // Emit WebSocket message
-    this.eventsGateway.sendMessage(savedRow);
+    this.eventsGateway.sendNewRowMessage(savedRow);
 
     return savedRow;
   }
@@ -44,14 +41,12 @@ export class RowService {
     row.content = content;
     const updatedRow = await this.rowRepository.save(row);
 
-    // Log event in analytics
     await this.analyticsService.logEvent(
       'update',
       `Row with ID ${id} updated to content: ${content}`,
     );
 
-    // Emit WebSocket message
-    this.eventsGateway.sendMessage(updatedRow);
+    this.eventsGateway.sendUpdatedRowMessage(updatedRow);
 
     return updatedRow;
   }
@@ -88,16 +83,12 @@ export class RowService {
     return row;
   }
 
-  private async notifyBatch(): Promise<void> {
-    const totalRows = await this.rowRepository.count();
-
-    if (totalRows % 10 === 0) {
-      const emails = ['ihorstetsky618@gmail.com']; // Add all file access emails
-      const message = `There are now ${totalRows} rows in the sheet.`;
-
-      for (const email of emails) {
-        await this.emailService.sendEmailNotification(email, message);
-      }
-    }
+  async exists(rowId: string): Promise<boolean> {
+    const row = await this.rowRepository.findOne({
+      where: {
+        id: Number(rowId),
+      },
+    });
+    return !!row;
   }
 }

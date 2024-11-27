@@ -13,4 +13,7 @@ export class Analytics {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   timestamp: Date;
+
+  @Column()
+  rowCount: number;
 }

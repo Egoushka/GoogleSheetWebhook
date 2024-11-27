@@ -5,7 +5,17 @@ import { Server } from 'socket.io';
 export class EventsGateway {
   @WebSocketServer() server: Server;
 
-  sendMessage(data: any) {
-    this.server.emit('new-row', data);
+  sendNewRowMessage(data: any) {
+    this.server.emit('new-row', {
+      type: 'new',
+      content: data,
+    });
+  }
+
+  sendUpdatedRowMessage(data: any) {
+    this.server.emit('updated-row', {
+      type: 'updated',
+      content: data,
+    });
   }
 }
