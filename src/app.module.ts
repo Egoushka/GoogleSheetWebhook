@@ -14,7 +14,7 @@ import { AnalyticsRepository } from './repositories/analytics.repository';
   imports: [
     CacheModule.register(),
     TypeOrmModule.forRoot({
-      type: process.env.DB_TYPE as any,
+      type: 'postgres',
       host: process.env.DB_HOST,
       port: parseInt(process.env.DB_PORT, 10),
       username: process.env.DB_USERNAME,
@@ -22,6 +22,8 @@ import { AnalyticsRepository } from './repositories/analytics.repository';
       database: process.env.DB_DATABASE,
       entities: [Row, Analytics],
       synchronize: process.env.DB_SYNCHRONIZE === 'true',
+      logging: true,
+      logger: 'advanced-console',
     }),
     TypeOrmModule.forFeature([Row, Analytics]),
   ],
