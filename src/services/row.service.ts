@@ -1,26 +1,59 @@
+import { AnalyticsService } from 'src/services/analytics.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Inject } from '@nestjs/common';
 import { Cache } from '@nestjs/cache-manager';
 import { Row } from 'src/models/row.model';
+import { EventsGateway } from 'src/events/events.gateway';
+import { EmailService } from './email.service';
+import { RowRepository } from 'src/repositories/row.repository';
 
 @Injectable()
 export class RowService {
   constructor(
     @InjectRepository(Row)
-    private readonly rowRepository: Repository<Row>,
-    @Inject('CACHE_MANAGER') private readonly cacheManager: Cache, // Updated Cache Type
+    private readonly rowRepository: RowRepository,
+    private readonly analyticsService: AnalyticsService,
+    private readonly eventsGateway: EventsGateway,
+    private readonly emailService: EmailService,
+    @Inject('CACHE_MANAGER') private readonly cacheManager: Cache,
   ) {}
 
   async createRow(content: string): Promise<Row> {
     const row = this.rowRepository.create({ content });
     const savedRow = await this.rowRepository.save(row);
 
-    this.triggerWebhook(savedRow);
-    this.triggerWebSocket(savedRow);
+    await this.analyticsService.logEvent(
+      'create',
+      `New row created with content: ${content}`,
+    );
+
+    // Emit WebSocket message
+    this.eventsGateway.sendMessage(savedRow);
 
     return savedRow;
+  }
+
+  async updateRow(id: number, content: string): Promise<Row> {
+    const row = await this.rowRepository.findOne({ where: { id } });
+
+    if (!row) {
+      throw new Error(`Row with ID ${id} not found`);
+    }
+
+    row.content = content;
+    const updatedRow = await this.rowRepository.save(row);
+
+    // Log event in analytics
+    await this.analyticsService.logEvent(
+      'update',
+      `Row with ID ${id} updated to content: ${content}`,
+    );
+
+    // Emit WebSocket message
+    this.eventsGateway.sendMessage(updatedRow);
+
+    return updatedRow;
   }
 
   async getAllRows(): Promise<Row[]> {
@@ -55,34 +88,16 @@ export class RowService {
     return row;
   }
 
-  async updateRow(id: number, content: string): Promise<Row> {
-    const row = await this.getRowById(id);
-    row.content = content;
+  private async notifyBatch(): Promise<void> {
+    const totalRows = await this.rowRepository.count();
 
-    const updatedRow = await this.rowRepository.save(row);
+    if (totalRows % 10 === 0) {
+      const emails = ['ihorstetsky618@gmail.com']; // Add all file access emails
+      const message = `There are now ${totalRows} rows in the sheet.`;
 
-    await this.cacheManager.del(`row_${id}`);
-    await this.cacheManager.del('all_rows');
-
-    this.triggerWebhook(updatedRow);
-    this.triggerWebSocket(updatedRow);
-
-    return updatedRow;
-  }
-
-  async deleteRow(id: number): Promise<void> {
-    const row = await this.getRowById(id);
-    await this.rowRepository.remove(row);
-
-    await this.cacheManager.del(`row_${id}`);
-    await this.cacheManager.del('all_rows');
-  }
-
-  private triggerWebhook(row: Row) {
-    console.log(`Webhook triggered for row: ${JSON.stringify(row)}`);
-  }
-
-  private triggerWebSocket(row: Row) {
-    console.log(`WebSocket triggered for row: ${JSON.stringify(row)}`);
+      for (const email of emails) {
+        await this.emailService.sendEmailNotification(email, message);
+      }
+    }
   }
 }
