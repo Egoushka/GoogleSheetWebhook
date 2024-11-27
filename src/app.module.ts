@@ -8,6 +8,7 @@ import { Analytics } from './models/analytics.model';
 import { Row } from './models/row.model';
 import { AnalyticsService } from './services/analytics.service';
 import { RowService } from './services/row.service';
+import { AnalyticsRepository } from './repositories/analytics.repository';
 
 @Module({
   imports: [
@@ -25,6 +26,6 @@ import { RowService } from './services/row.service';
     TypeOrmModule.forFeature([Row, Analytics]),
   ],
   controllers: [RowController, WebhookController],
-  providers: [RowService, AnalyticsService, EventsGateway],
+  providers: [RowService, AnalyticsService, EventsGateway, AnalyticsRepository],
 })
 export class AppModule {}
