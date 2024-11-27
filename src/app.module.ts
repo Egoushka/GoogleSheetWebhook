@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CacheModule } from '@nestjs/cache-manager';
-import { RowService } from './row.service';  // Adjust import path
-import { Row } from './models/row.model';  // Adjust import path
-import { Analytics } from './models/analytics.model';  // Adjust import path
-import { AnalyticsService } from './analytics.service';
-import { EventsGateway } from './events.gateway';
-import { RowController } from './row.controller';  // Adjust import path
-import { WebhookController } from './webhook.controller';  // Adjust import path
+import { RowController } from './controllers/row.controller';
+import { WebhookController } from './controllers/webhook.controller';
+import { EventsGateway } from './events/events.gateway';
+import { Analytics } from './models/analytics.model';
+import { Row } from './models/row.model';
+import { AnalyticsService } from './services/analytics.service';
+import { RowService } from './services/row.service';
 
 @Module({
   imports: [
