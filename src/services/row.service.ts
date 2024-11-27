@@ -5,13 +5,13 @@ import { Inject } from '@nestjs/common';
 import { Cache } from '@nestjs/cache-manager';
 import { Row } from 'src/models/row.model';
 import { EventsGateway } from 'src/events/events.gateway';
-import { RowRepository } from 'src/repositories/row.repository';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class RowService {
   constructor(
     @InjectRepository(Row)
-    private readonly rowRepository: RowRepository,
+    private readonly rowRepository: Repository<Row>,
     private readonly analyticsService: AnalyticsService,
     private readonly eventsGateway: EventsGateway,
     @Inject('CACHE_MANAGER') private readonly cacheManager: Cache,

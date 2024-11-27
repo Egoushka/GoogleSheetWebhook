@@ -11,7 +11,6 @@ import { AnalyticsService } from './services/analytics.service';
 import { EmailService } from './services/email.service';
 import { RowService } from './services/row.service';
 import { AnalyticsRepository } from './repositories/analytics.repository';
-import { RowRepository } from './repositories/row.repository';
 import { EventsGateway } from './events/events.gateway';
 
 dotenv.config();
@@ -36,7 +35,6 @@ dotenv.config();
     EmailService,
     RowService,
     AnalyticsRepository,
-    RowRepository,
     EventsGateway,
   ],
 })
