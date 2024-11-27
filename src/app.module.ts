@@ -1,19 +1,13 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import * as dotenv from 'dotenv';
 import { CacheModule } from '@nestjs/cache-manager';
-import { Analytics } from './models/analytics.model';
-import { Row } from './models/row.model';
-import { AnalyticsController } from './controllers/analytics.controller';
-import { RowController } from './controllers/row.controller';
-import { WebhookController } from './controllers/webhook.controller';
-import { AnalyticsService } from './services/analytics.service';
-import { EmailService } from './services/email.service';
-import { RowService } from './services/row.service';
-import { AnalyticsRepository } from './repositories/analytics.repository';
-import { EventsGateway } from './events/events.gateway';
-
-dotenv.config();
+import { RowService } from './row.service';  // Adjust import path
+import { Row } from './models/row.model';  // Adjust import path
+import { Analytics } from './models/analytics.model';  // Adjust import path
+import { AnalyticsService } from './analytics.service';
+import { EventsGateway } from './events.gateway';
+import { RowController } from './row.controller';  // Adjust import path
+import { WebhookController } from './webhook.controller';  // Adjust import path
 
 @Module({
   imports: [
@@ -28,14 +22,9 @@ dotenv.config();
       entities: [Row, Analytics],
       synchronize: process.env.DB_SYNCHRONIZE === 'true',
     }),
+    TypeOrmModule.forFeature([Row, Analytics]),
   ],
-  controllers: [AnalyticsController, RowController, WebhookController],
-  providers: [
-    AnalyticsService,
-    EmailService,
-    RowService,
-    AnalyticsRepository,
-    EventsGateway,
-  ],
+  controllers: [RowController, WebhookController],
+  providers: [RowService, AnalyticsService, EventsGateway],
 })
 export class AppModule {}
